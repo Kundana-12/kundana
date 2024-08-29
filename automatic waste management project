@@ -1,0 +1,41 @@
+CODE:
+#include <Servo.h>
+Servo myservo;
+// Create a Servo
+objectint irSensorPin
+= 2; // IR
+Sensor input pin
+int soilMoisturePin = A0; // Soil moisture
+sensor analogpinint soilMoistureThreshold =
+500; // Set your desired threshold
+void setup() {
+myservo.attach(9); //Attaches the servo
+on pin 9
+pinMode(irSensorPin, INPUT);
+myservo.write(90); // Initialize servo to 90
+degrees (middleposition)Serial.begin(9600);
+}
+void loop() {
+int irValue = digitalRead(irSensorPin);
+int soilMoistureValue = analogRead(soilMoisturePin);
+// Check if the IR sensor detects
+anobstacle if (irValue == HIGH) {
+// Check soil moisture level
+if (soilMoistureValue < soilMoistureThreshold) {
+// Soil moisture is low,turn the servo to 0 degrees
+my servo.write(0);
+Serial.println("Obstacle detected, soil moisture is low. Servo turned to 0 degrees.");
+} else {
+// Soil moisture is sufficient, turn the servo to
+180 degreesmyservo.write(180);
+Serial.println("Obstacle detected, soil moisture is good. Servo turned to 180
+degrees.");
+}
+30
+} else {
+// No obstacle detected,keep the servo at 90
+degrees myservo.write(90);
+Serial.println("No obstacle detected. Servo in default position (90 degrees).");
+}
+delay(1000); // Delay for stability and readability of serial output
+}
