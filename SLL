@@ -1,0 +1,119 @@
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct node Node;
+
+struct node {
+    int data;
+    Node *next;
+};
+
+Node* insertAtBeg(Node *head, int x)
+{
+    // Creation of Node 
+    Node *nn = (Node*)malloc(sizeof(Node));
+    
+    // Definition of Node
+    nn -> data = x;
+    nn -> next = head;
+    
+    // Connection of Node
+    head = nn;
+    
+    return head;
+}
+
+Node* insertAtEnd(Node *head, int x)
+{
+    // Creation of Node 
+    Node *nn = (Node*)malloc(sizeof(Node));
+    
+    // Definition of Node
+    nn -> data = x;
+    nn -> next = NULL;
+    
+    // Connection of Node
+    if(!head)
+        return nn;
+    else
+    {
+        Node *temp = head;
+        
+        while(temp -> next)
+            temp = temp -> next;
+        
+        temp -> next = nn;
+    }
+    
+    return head;
+}
+
+Node* deleteAtBeg(Node *head)
+{
+    if(!head)
+        return NULL;
+    else if(!head -> next)
+    {
+        free(head);
+        return NULL;
+    }
+    else
+    {
+        Node *temp = head;
+        head = head -> next;
+        free(temp);
+        return head;
+    }
+}
+
+Node* deleteAtEnd(Node *head)
+{
+    if(!head)
+        return NULL;
+    else if(!head -> next)
+    {
+        free(head);
+        return NULL;
+    }
+    else
+    {
+        Node *temp = head;
+        
+        while(temp -> next -> next)
+            temp = temp -> next;
+        
+        free(temp -> next);
+        temp -> next = NULL;
+        return head;
+    }
+}
+
+void display(Node *head)
+{
+    while(head)
+    {
+        printf("%d -> ", head -> data);
+        head = head -> next;
+    }
+    printf("NULL\n\n");
+}
+
+int main()
+{
+    Node *head = NULL;
+    int var;
+    
+    do {
+        scanf("%d", &var);
+        head = insertAtEnd(head, var);
+    }while(var != -1);
+    
+    display(head);
+    
+    head = deleteAtBeg(head);
+    display(head);
+    
+    head = deleteAtEnd(head);
+    display(head);
+
+    return 0;
+}
