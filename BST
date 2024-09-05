@@ -1,0 +1,105 @@
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct node Node;
+
+struct node {
+    int data;
+    Node *left, *right;
+};
+
+Node* insert(Node *root, int x)
+{
+    // Creation of Node
+    Node *nn = (Node*)malloc(sizeof(Node));
+    
+    // Definition of Node 
+    nn -> data = x;
+    nn -> left = nn -> right = NULL;
+    
+    // Connection of Node
+    if(!root)
+        return nn;
+    else {
+        Node *temp = root;
+        
+        while(1)
+        {
+            if(x < temp -> data) // direction
+            {
+                if(temp -> left == NULL) // availablity
+                {
+                    temp -> left = nn;
+                    break;
+                }
+                else
+                    temp = temp -> left;
+            }
+            else
+            {
+                if(temp -> right == NULL) // availablity
+                {
+                    temp -> right = nn;
+                    break;
+                }
+                else
+                    temp = temp -> right;
+            }
+        }
+        return root;
+    }
+}
+
+void inOrder(Node *root)
+{
+    if(root)
+    {
+        inOrder(root -> left);
+        printf("%d ", root -> data);
+        inOrder(root -> right);
+    }
+}
+
+void preOrder(Node *root)
+{
+    if(root)
+    {
+        printf("%d ", root -> data);
+        preOrder(root -> left);
+        preOrder(root -> right);
+    }
+}
+
+void postOrder(Node *root)
+{
+    if(root)
+    {
+        postOrder(root -> left);
+        postOrder(root -> right);
+        printf("%d ", root -> data);
+    }
+}
+
+int main()
+{
+    Node *root = NULL;
+    int var;
+    
+    do {
+        scanf("%d", &var);
+        root = insert(root, var);
+    }while(var != -1);
+    
+    printf("In-Order : \n");
+    inOrder(root);
+    printf("\n\n");
+    
+    printf("Pre-Order : \n");
+    preOrder(root);
+    printf("\n\n");
+    
+    printf("Post-Order : \n");
+    postOrder(root);
+    printf("\n\n");
+
+    return 0;
+}
