@@ -1,0 +1,221 @@
+Setting up Django Project and Blog App:
+bash
+django-admin startproject myblog
+cd myblog
+python manage.py startapp blog
+2. Configure settings.py:
+python
+INSTALLED_APPS = [
+'django.contrib.admin',
+'django.contrib.auth',
+'django.contrib.contenttypes',
+'django.contrib.sessions',
+'django.contrib.messages',
+'django.contrib.staticfiles',
+'blog', # Add blog app
+]
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / "static"] # Configure static file handling
+3. Models (blog/models.py):
+python
+from django.db import models
+from django.contrib.auth.models import User
+32
+from django.utils import timezone
+class Post(models.Model):
+title = models.CharField(max_length=100)
+content = models.TextField()
+date_posted = models.DateTimeField(default=timezone.now)
+author = models.ForeignKey(User, on_delete=models.CASCADE)
+def __str__(self):
+return self.title
+4. Views (blog/views.py):
+python
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Post
+from django.contrib.auth.decorators import login_required
+def home(request):
+posts = Post.objects.all().order_by('-date_posted')
+return render(request, 'blog/home.html', {'posts': posts})
+@login_required
+def create_post(request):
+if request.method == 'POST':
+title = request.POST.get('title')
+content = request.POST.get('content')
+33
+post = Post(title=title, content=content, author=request.user)
+post.save()
+return redirect('blog-home')
+return render(request, 'blog/create_post.html')
+@login_required
+def update_post(request, pk):
+post = get_object_or_404(Post, pk=pk)
+if request.method == 'POST':
+post.title = request.POST.get('title')
+post.content = request.POST.get('content')
+post.save()
+return redirect('blog-home')
+return render(request, 'blog/update_post.html', {'post': post})
+@login_required
+def delete_post(request, pk):
+post = get_object_or_404(Post, pk=pk)
+if request.method == 'POST':
+post.delete()
+return redirect('blog-home')
+return render(request, 'blog/delete_post.html', {'post': post})
+5. URLs (blog/urls.py):
+python
+from django.urls import path
+34
+from . import views
+urlpatterns = [
+path('', views.home, name='blog-home'),
+path('post/new/', views.create_post, name='create-post'),
+path('post/<int:pk>/update/', views.update_post, name='update-post'),
+path('post/<int:pk>/delete/', views.delete_post, name='delete-post'),
+]
+urls.py (myblog/urls.py):
+from django.contrib import admin
+from django.urls import path, include
+urlpatterns = [
+path('admin/', admin.site.urls),
+path('', include('blog.urls')),
+]
+6. Templates:
+base.html
+<!DOCTYPE html>
+<html>
+<head>
+<title>{% block title %}My Blog{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="{% static 'blog/styles.css' %}">
+</head>
+<body>
+35
+<header>
+<nav>
+<a href="{% url 'blog-home' %}">Home</a>
+{% if user.is_authenticated %}
+<a href="{% url 'create-post' %}">Create Post</a>
+<a href="{% url 'logout' %}">Logout</a>
+{% else %}
+<a href="{% url 'login' %}">Login</a>
+{% endif %}
+</nav>
+</header>
+<div class="container">
+{% block content %}
+{% endblock %}
+</div>
+</body>
+</html>
+home.html:
+{% extends "blog/base.html" %}
+{% block content %}
+<h1>Blog Posts</h1>
+<ul>
+{% for post in posts %}
+<li>
+36
+<h2>{{ post.title }}</h2>
+<p>{{ post.content }}</p>
+<small>Posted by {{ post.author }} on {{ post.date_posted }}</small>
+<a href="{% url 'update-post' post.pk %}">Edit</a> |
+<a href="{% url 'delete-post' post.pk %}">Delete</a>
+</li>
+{% endfor %}
+</ul>
+{% endblock %}
+create_post.html:
+{% extends "blog/base.html" %}
+{% block content %}
+<h2>Create New Post</h2>
+<form method="POST">
+{% csrf_token %}
+<label for="title">Title:</label>
+<input type="text" name="title" id="title">
+<label for="content">Content:</label>
+<textarea name="content" id="content"></textarea>
+<button type="submit">Create</button>
+</form>
+{% endblock %}
+update_post.html:
+{% extends "blog/base.html" %}
+37
+{% block content %}
+<h2>Edit Post</h2>
+<form method="POST">
+{% csrf_token %}
+<label for="title">Title:</label>
+<input type="text" name="title" id="title" value="{{ post.title }}">
+<label for="content">Content:</label>
+<textarea name="content" id="content">{{ post.content }}</textarea>
+<button type="submit">Update</button>
+</form>
+{% endblock %}
+delete_post.html:
+{% extends "blog/base.html" %}
+{% block content %}
+<h2>Delete Post</h2>
+<p>Are you sure you want to delete this post?</p>
+<form method="POST">
+{% csrf_token %}
+<button type="submit">Delete</button>
+</form>
+{% endblock %}
+7. CSS (blog/static/blog/styles.css):
+css
+38
+body {
+font-family: Arial, sans-serif;
+background-color: #f4f4f4;
+color: #333;
+}
+header {
+background-color: #333;
+color: #fff;
+padding: 10px 0;
+text-align: center;
+}
+header nav a {
+color: #fff;
+margin: 0 15px;
+text-decoration: none;
+}
+.container {
+max-width: 800px;
+margin: 20px auto;
+padding: 20px;
+background-color: #fff;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+39
+}
+form label {
+display: block;
+margin-top: 10px;
+}
+form input, form textarea {
+width: 100%;
+padding: 8px;
+margin: 10px 0;
+}
+button {
+padding: 10px 15px;
+background-color: #333;
+color: #fff;
+border: none;
+}
+8. Run Migrations and Start the Server:
+bash
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser # Create an admin user
+python manage.py runserver
+40
+9. User Authentication:
+python
+from django.urls import path, include
+urlpatterns = [
+path('admin/', admin.site.urls),
+path('accounts/', include('django.contrib.auth.urls')), # Include built-in authentication views
+path('', include('blog.urls')),
+]
