@@ -1,0 +1,428 @@
+ProjectSecurityConfigure.java
+package com.pb.config;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
+import com.pb.security.CustomUserDetailsService;
+@Configuration
+public class ProjectSecurityConfigure {
+@Bean
+public SecurityFilterChain masaiSecurityFilter(HttpSecurity http) throws Exception {
+http.authorizeHttpRequests( (auth)->auth
+.antMatchers("/user/**").hasRole("USER")
+.antMatchers("/**").permitAll()
+)
+.formLogin().loginPage("/signin")
+.loginProcessingUrl("/dologin")
+28
+.defaultSuccessUrl("/user/dashboard")
+.failureUrl("/failed")
+.and().csrf().disable().httpBasic();
+return http.build();
+}
+@Bean
+public PasswordEncoder passwordEncoder() {
+return NoOpPasswordEncoder.getInstance();
+return new BCryptPasswordEncoder();
+}
+}
+StudentController.java
+package com.pb.controller;
+import java.security.Principal;
+import java.util.List;
+import javax.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import com.pb.helper.Message;
+import com.pb.model.Contact;
+29
+import com.pb.model.User;
+import com.pb.repository.ContactRepo;
+import com.pb.repository.UserRepo;
+@RequestMapping("/user")
+@Controller
+public class UserController {
+@Autowired
+private UserRepo userRepo;
+@Autowired
+private ContactRepo contactRepo;
+@ModelAttribute
+public void addCommonData(Model model ,Principal p ) {
+User u = userRepo.findByEmail(p.getName());
+model.addAttribute("user",u);
+}
+@RequestMapping("/dashboard")
+public String dashboard(Model model) {
+List<Contact> ls = contactRepo.findAll();
+List<User> ls1 = userRepo.findAll();
+model.addAttribute("count",ls.size());
+model.addAttribute("users",ls1.size());
+return "dashboard";
+}
+@RequestMapping("/addcontact")
+public String addcontact(Model model) {
+model.addAttribute("title","Add contact");
+model.addAttribute("contact",new Contact());
+return "addcontact";
+}@RequestMapping("/about")
+public String about(Model model,Principal p) {
+User u = userRepo.findByEmail(p.getName());
+model.addAttribute("title","this is my about page !!");
+model.addAttribute("user",u);
+return "about";
+}
+@PostMapping("/processcontact")
+public String processContact(@ModelAttribute Contact contact,Principal p ,HttpSession
+session) {
+try {
+mobile number!!");
+"success"));
+User u = userRepo.findByEmail(p.getName());
+contact.setUser(u);
+if(contact.getPhone().length()!=10) throw new Exception("invalid
+u.getContacts().add(contact);
+userRepo.save(u);
+System.out.println(contact);
+System.out.println("added !!!!!!");
+session.setAttribute("message",new Message("Successfully registered!!",
+} catch (Exception e) {
+System.out.println(e.getMessage());
+session.setAttribute("message",new Message("something went
+wrong!!"+e.getMessage(), "danger"));
+}
+return "addcontact";
+}
+@RequestMapping("/showcontacts/{page}")
+public String showContacts( @PathVariable("page") Integer page, Model
+model,Principal p ) {
+model.addAttribute("title","Show contact list");
+31
+User u = userRepo.findByEmail(p.getName()
+Pageable pageable = PageRequest.of(page, 2);
+Page<Contact> contacts= contactRepo.findContactByUser(u.getId(),pageable);
+for(Contact c : contacts) {
+System.out.println(c.getImage());
+}
+model.addAttribute("contacts",contacts);
+model.addAttribute("currentPage",page);
+model.addAttribute("totalPages",contacts.getTotalPages());
+return "showcontacts";
+}
+HomeController.java
+package com.pb.controller;
+import java.security.Principal;
+import javax.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import com.pb.helper.Message;
+import com.pb.model.Contact;
+import com.pb.model.User;
+import com.pb.repository.UserRepo;
+32
+@Controller
+public class HomeController {
+@Autowired
+private UserRepo userRepo;
+@Autowired
+PasswordEncoder encoder;
+@GetMapping("/test")
+@ResponseBody
+public String test() {
+User u = new User();
+u.setName("raju");
+u.setEmail("raju@gmail.com");
+userRepo.save(u);
+return "working";
+}
+@RequestMapping("/home")
+public String home() {
+return "home";
+}
+@RequestMapping("/signup")
+public String signup(Model model) {
+model.addAttribute("title","Register here !!");
+model.addAttribute("user",new User());
+return "signup";
+}
+@RequestMapping(value="/do_register",method = RequestMethod.POST)
+public String registeruser(@ModelAttribute("user") User user,Model model,HttpSession
+session){
+"alert-success"));
+user.setImageurl("demp.png");
+user.setPassword(encoder.encode(user.getPassword()));
+User result = userRepo.save(user);
+model.addAttribute("user",new User());
+System.out.println("user" + result);
+session.setAttribute("message",new Message("Successfully registered!!",
+return "signup";
+} catch (Exception e) {
+model.addAttribute("user",user);
+session.setAttribute("message",new Message("something went
+wrong!!"+e.getMessage(), "alert-danger"));
+return "signup";
+}
+}
+@RequestMapping("/signin")
+public String customlogin(Model model) {
+return "login";
+}
+@RequestMapping("/failed")
+public String failed(Model model) {
+return "failed";
+}
+}
+FacultyController.java
+package com.example.collegephonebook.controller;
+import com.example.collegephonebook.entity.Student;
+import com.example.collegephonebook.service.StudentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+@RestController
+@RequestMapping("/api/students")
+public class StudentController {
+@Autowired
+private StudentService service;
+@PostMapping
+public Student addStudent(@RequestBody Student student) {
+return service.save(student);
+}
+@GetMapping
+public List<Student> getAll() {
+return service.getAll();
+}
+@DeleteMapping("/{id}")
+public void deleteStudent(@PathVariable Long id) {
+service.deleteById(id);
+}
+}
+Student.java
+package com.pb.model;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import lombok.Data;
+@Data
+@Entity
+public class User {
+@Id
+@GeneratedValue(strategy = GenerationType.AUTO)
+private Integer id;
+private String name;
+private String email;
+private String password;
+private String role;
+private String imageurl;
+private String about;
+@OneToMany(cascade = CascadeType.ALL,mappedBy = "user")
+private List<Contact> contacts = new ArrayList<>();
+@Override
+public String toString() {
+return "User [id=" + id + ", name=" + name + ", email=" + email + ",
+password=" + password + ", role=" + role
++ ", imageurl=" + imageurl + ", about=" + about + ", contacts=" +
+contacts + "]";
+}
+}
+CollegePhoneBookApplication
+package com.example.collegephonebook;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+@SpringBootApplication
+public class CollegePhoneBookApplication {
+public static void main(String[] args) {
+SpringApplication.run(CollegePhoneBookApplication.class, args);
+}
+}
+Admin.java
+import jakarta.persistence.*;
+@Entity
+public class Student {
+@Id
+@GeneratedValuestrategy=GenerationType.IDENTITY
+private Long id;
+private String name;
+private String phone;
+private String email;
+private String stream;
+public Long getId() {
+return id;
+}
+public void setId(Long id) {
+this.id = id;
+}
+public String getName() {
+return name;
+}
+public void setName(String name) {
+this.name = name;
+}
+public String getPhone() {
+return phone;
+}
+public void setPhone(String phone) {
+this.phone = phone;
+}
+public String getEmail() {
+return email;
+}
+public void setEmail(String email) {
+this.email = email;
+}
+public String getStream() {
+return stream;
+}
+public void setStream(String stream) {
+this.stream = stream;
+}
+}
+Faculty.java
+package com.example.collegephonebook.entity;
+import jakarta.persistence.*;
+@Entity
+public class Faculty {
+@Id
+@GeneratedValue strategy GenerationType.IDENTITY
+private Long id;
+private String name;
+private String phone;
+private String email;
+private String department;
+public Long getId() {
+return id;
+}
+public void setId(Long id) {
+this.id = id;
+}
+public String getName() {
+return name;
+}
+public void setName(String name) {
+this.name = name;
+}
+public String getPhone() {
+return phone;
+}
+public void setPhone(String phone) {
+this.phone = phone;
+}
+public String getEmail() {
+return email;
+}
+public void setEmail(String email) {
+this.email = email;
+}
+public String getDepartment() {
+return department;
+}
+public void setDepartment(String department) {
+this.department = department;
+}
+}
+Admin.java
+import jakarta.persistence.*;
+@Entity
+public class Admin {
+@Id
+@GeneratedValue(strategyGenerationType.IDENTITY)
+private Long id;
+private String username;
+private String password;
+public Long getId() {
+return id;
+}
+public void setId(Long id) {
+this.id = id;
+}
+public String getUsername() {
+return username;
+}
+public void setUsername(String username) {
+this.username = username;
+}
+public String getPassword() {
+return password;
+}
+public void setPassword(String password) {
+this.password = password;
+}
+}
+StudentRepository.java
+package com.example.collegephonebook.repository;
+import com.example.collegephonebook.entity.Student;
+import org.springframework.data.jpa.repository.JpaRepository;
+public interface StudentRepository extends JpaRepository<Student, Long> {}
+FacultyRepository.java
+package com.example.collegephonebook.repository;
+import com.example.collegephonebook.entity.Faculty;
+import org.springframework.data.jpa.repository.JpaRepository;
+public interface FacultyRepository extends JpaRepository<Faculty, Long> {}
+AdminRepository.java
+package com.example.collegephonebook.repository;
+import com.example.collegephonebook.entity.Admin;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
+public interface AdminRepository extends JpaRepository<Admin, Long> {
+Optional<Admin> findByUsername(String username);
+}
+StudentService.java
+package com.example.collegephonebook.service;
+import com.example.collegephonebook.entity.Student;
+import com.example.collegephonebook.repository.StudentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.List;
+@Service
+public class StudentService {
+@Autowired
+private StudentRepository repo;
+public Student save(Student student) {
+return repo.save(student);
+}
+public List<Student> getAll() {
+return repo.findAll();
+}
+public void deleteById(Long id) {
+repo.deleteById(id);
+}
+}
+application.properties
+server.port=8888
+spring.datasource.url=jdbc:mysql://localhost:3306/db_phonebook
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.username=root
+spring.datasource.password=28998
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.mvc.pathmatch.matching-strategy = ANT_PATH_MATCHER
