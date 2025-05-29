@@ -1,0 +1,353 @@
+Coding Part: XML
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+style="@style/CardViewStyle"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginHorizontal="10dp"
+app:cardBackgroundColor="@color/white">
+<RelativeLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content">
+<TextView
+android:id="@+id/titleTaskTxt"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_margin="16dp"
+android:text="Update Task"
+android:textSize="24sp"
+android:textStyle="bold" />
+<ImageView
+android:id="@+id/closeImg"
+android:layout_width="40dp"
+android:layout_height="40dp"
+android:layout_alignParentEnd="true"
+android:layout_margin="8dp"
+android:src="@drawable/ic_close" />
+<View
+android:id="@+id/viewHLine"
+android:layout_width="match_parent"
+android:layout_height="3dp"
+android:layout_below="@id/titleTaskTxt"
+android:background="@color/black" />
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_below="@id/viewHLine"
+android:layout_centerHorizontal="true"
+android:layout_marginHorizontal="10dp"
+android:layout_marginVertical="8dp"
+android:orientation="vertical">
+<com.google.android.material.textfield.TextInputLayout
+style="@style/Widget.App.TextInputLayout"
+android:id="@+id/edTaskTitleL"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:hint="Enter The Task Title">
+<com.google.android.material.textfield.TextInputEditText
+android:id="@+id/edTaskTitle"
+android:layout_width="match_parent"
+android:layout_height="?actionBarSize"
+android:background="#EAE4E8"
+android:inputType="text" />
+</com.google.android.material.textfield.TextInputLayout>
+<com.google.android.material.textfield.TextInputLayout
+style="@style/Widget.App.TextInputLayout"
+android:id="@+id/edTaskDescL"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:hint="Enter The Task Description">
+<com.google.android.material.textfield.TextInputEditText
+android:id="@+id/edTaskDesc"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:background="#EAE4E8"
+android:gravity="top|start"
+android:inputType="textMultiLine"
+android:lines="5"
+android:maxLines="5" />
+</com.google.android.material.textfield.TextInputLayout>
+<Button
+android:id="@+id/updateTaskBtn"
+android:layout_width="wrap_content"
+android:layout_height="?actionBarSize"
+android:layout_gravity="center"
+android:layout_marginTop="4dp"
+android:backgroundTint="@color/black"
+style="@style/Widget.App.Button.Fill"
+android:text="Update Task"
+android:textSize="20sp" />
+</LinearLayout>
+</RelativeLayout>
+</com.google.android.material.card.MaterialCardView>
+Task_grid_layout code:
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+style="@style/CardViewStyle"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginHorizontal="4dp"
+android:layout_marginVertical="4dp"
+android:foreground="?android:attr/selectableItemBackground"
+app:cardBackgroundColor="@color/white"
+app:cardElevation="10dp">
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_margin="10dp"
+android:orientation="vertical">
+<TextView
+android:id="@+id/titleTxt"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:text="Title"
+android:textColor="@color/black"
+android:textSize="20sp"
+android:textStyle="bold" />
+<TextView
+android:id="@+id/descrTxt"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginVertical="4dp"
+android:text="Description"
+android:textColor="@color/black"
+android:textSize="18sp"
+android:textStyle="bold" />
+<TextView
+android:id="@+id/dateTxt"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginVertical="4dp"
+android:text="Date"
+android:textSize="18sp" />
+<LinearLayout
+android:id="@+id/editDeleteL"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginTop="4dp"
+android:gravity="center"
+android:orientation="horizontal">
+<ImageView
+android:id="@+id/editImg"
+android:layout_width="35dp"
+android:layout_height="35dp"
+android:src="@drawable/ic_edit" />
+<ImageView
+android:id="@+id/deleteImg"
+android:layout_width="35dp"
+android:layout_height="35dp"
+android:src="@drawable/ic_delete" />
+</LinearLayout>
+</LinearLayout>
+</com.google.android.material.card.MaterialCardView>
+Task_list_layout:
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+style="@style/CardViewStyle"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginVertical="4dp"
+android:foreground="?android:attr/selectableItemBackground"
+app:cardBackgroundColor="@color/white"
+app:cardElevation="10dp">
+<RelativeLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_margin="10dp">
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_alignParentStart="false"
+android:layout_centerVertical="true"
+android:layout_toStartOf="@id/editDeleteL"
+android:orientation="vertical">
+<TextView
+android:id="@+id/titleTxt"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:text="Title"
+android:textColor="@color/black"
+android:textSize="20sp"
+android:textStyle="bold" />
+<TextView
+android:id="@+id/descrTxt"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginVertical="4dp"
+android:text="Description"
+android:textColor="@color/black"
+android:textSize="18sp"
+android:textStyle="bold" />
+<TextView
+android:id="@+id/dateTxt"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginVertical="4dp"
+android:text="Date"
+android:textSize="18sp" />
+</LinearLayout>
+<LinearLayout
+android:id="@+id/editDeleteL"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_alignParentEnd="true"
+android:layout_centerVertical="true"
+android:orientation="vertical">
+<ImageView
+android:id="@+id/editImg"
+android:layout_width="35dp"
+android:layout_height="35dp"
+android:layout_marginVertical="4dp"
+android:src="@drawable/ic_edit" />
+<ImageView
+android:id="@+id/deleteImg"
+android:layout_width="35dp"
+android:layout_height="35dp"
+android:layout_marginVertical="4dp"
+android:src="@drawable/ic_delete" />
+</LinearLayout>
+</RelativeLayout>
+</com.google.android.material.card.MaterialCardView>
+Colors.XML:
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<color name="black">#FF000000</color>
+<color name="white">#FFFFFFFF</color>
+<color name="mainBackgroundColor">#03FF72</color>
+</resources>
+Themes.XML:
+<resources xmlns:tools="http://schemas.android.com/tools">
+<!-- Base application theme. -->
+<style name="Base.Theme.TodoApp"
+parent="Theme.Material3.Light.NoActionBar">
+<!-- Customize your light theme here. -->
+<!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<item name="fontFamily">@font/ubuntu_mono_regular</item>
+<item name="android:statusBarColor">@color/black</item>
+</style>
+<style name="Theme.TodoApp" parent="Base.Theme.TodoApp" />
+<style name="CardViewStyle" parent="Widget.Material3.CardView.Filled">
+<item name="shapeAppearanceOverlay">@style/CutShape</item>
+</style>
+<style name="CutShape" parent="ShapeAppearance.Material3.MediumComponent">
+<item name="cornerFamily">cut</item>
+<item name="cornerSize">12dp</item>
+</style>
+<style name="Widget.App.TextInputLayout"
+parent="Widget.Material3.TextInputLayout.FilledBox">
+<item name="shapeAppearance">@style/CutShape</item>
+<item name="hintTextColor">@color/black</item>
+<item name="boxStrokeColor">@color/black</item>
+<item name="endIconMode">clear_text</item>
+<item name="errorIconDrawable">@null</item>
+<item name="errorEnabled">true</item>
+<item name="android:textColor">@color/black</item>
+<item name="android:textCursorDrawable">@color/black</item>
+<item name="startIconTint">@color/black</item>
+</style>
+<style name="SearchInputLayout" parent="">
+<item name="endIconMode">clear_text</item>
+<item name="errorIconDrawable">@null</item>
+<item name="errorEnabled">true</item>
+<item name="android:textColor">@color/black</item>
+<item name="android:textCursorDrawable">@color/black</item>
+<item name="startIconTint">@color/black</item>
+</style>
+<style name="Widget.App.Button.Fill" parent="Widget.Material3.Button">
+<item name="shapeAppearance">@style/CutShape</item>
+</style>
+<style name="DialogCustomTheme" parent="Theme.Material3.DayNight.Dialog">
+<item name="android:windowBackground">@android:color/transparent</item>
+<item name="android:colorBackgroundCacheHint">@null</item>
+</style>
+</resources>
+Strings.XML:
+<resources>
+<string name="app_name">Todo-App</string>
+</resources>
+Data_Extraction_Rules.XML:
+<?xml version="1.0" encoding="utf-8"?><!--
+Sample data extraction rules file; uncomment and customize as necessary.
+See https://developer.android.com/about/versions/12/backup-restore#xml-
+changes
+for details.
+-->
+<data-extraction-rules>
+<cloud-backup>
+<!-- TODO: Use <include> and <exclude> to control what is backed up.
+<include .../>
+<exclude .../>
+-->
+</cloud-backup>
+<!--
+<device-transfer>
+<include .../>
+<exclude .../>
+</device-transfer>
+-->
+</data-extraction-rules>
+Build.gradle:
+plugins {
+id 'com.android.application'
+id 'org.jetbrains.kotlin.android'
+// if use kapt
+// add this
+//id 'kotlin-kapt'
+// but i use ksp
+id 'com.google.devtools.ksp'
+}
+android {
+namespace 'com.coding.meet.todo_app'
+compileSdk 33
+defaultConfig {
+applicationId "com.coding.meet.todo_app"
+minSdk 21
+targetSdk 33
+versionCode 1
+versionName "1.0"
+testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+}
+buildTypes {
+release {
+minifyEnabled false
+proguardFiles getDefaultProguardFile('proguard-android-
+optimize.txt'), 'proguard-rules.pro'
+}
+}
+compileOptions {
+sourceCompatibility JavaVersion.VERSION_17
+targetCompatibility JavaVersion.VERSION_17
+}
+kotlinOptions {
+jvmTarget = '17'
+}
+buildFeatures {
+viewBinding true
+}
+}
+dependencies {
+implementation 'androidx.core:core-ktx:1.9.0'
+implementation 'androidx.appcompat:appcompat:1.6.1'
+implementation 'com.google.android.material:material:1.9.0'
+implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+//Lottie
+implementation "com.airbnb.android:lottie:6.1.0"
+// Room
+def room_version = "2.5.2"
+implementation "androidx.room:room-runtime:$room_version"
+// optional - Kotlin Extensions and Coroutines support for Room
+implementation "androidx.room:room-ktx:$room_version"
+// To use Kotlin annotation processing tool (kapt)
+// kapt "androidx.room:room-compiler:$room_version"
+// To use Kotlin Symbol Processing (KSP)
+ksp "androidx.room:room-compiler:$room_version"
+testImplementation 'junit:junit:4.13.2'
+androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
